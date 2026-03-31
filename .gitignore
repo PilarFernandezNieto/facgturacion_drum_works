@@ -1,0 +1,19 @@
+# Archivos temporales de sistema
+.DS_Store
+Thumbs.db
+
+# Directorios de dependencias (por si acaso, aunque ya están en sus subcarpetas)
+node_modules/
+vendor/
+
+# Archivos de entorno y logs
+.env
+*.log
+
+# Muestras de PDF que no deben ir en el repo
+*.pdf
+
+# Configuración de editores
+.idea/
+.vscode/
+*.swp
