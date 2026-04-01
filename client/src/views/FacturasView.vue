@@ -5,13 +5,13 @@ import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore();
 const facturas = ref([]);
-const estudiantes = ref([]);
+const clientes = ref([]);
 const cargando = ref(true);
 const generando = ref(false);
 const mostrarModalBolo = ref(false);
 
 const formularioBolo = reactive({
-  estudiante_id: "",
+  cliente_id: "",
   subtotal: 0,
   iva_porcentaje: 10,
   irpf_porcentaje: 15,
@@ -32,10 +32,10 @@ async function cargarFacturas() {
   try {
     const [resFacturas, resClientes] = await Promise.all([
       api.get("facturas"),
-      api.get("estudiantes"),
+      api.get("clientes"),
     ]);
     facturas.value = resFacturas.data;
-    estudiantes.value = resClientes.data;
+    clientes.value = resClientes.data;
   } catch (error) {
     console.error("Error:", error);
   } finally {
@@ -73,7 +73,7 @@ async function guardarBolo() {
     mostrarModalBolo.value = false;
     await cargarFacturas();
     // Limpiar formulario
-    formularioBolo.estudiante_id = "";
+    formularioBolo.cliente_id = "";
     formularioBolo.subtotal = 0;
     formularioBolo.concepto = "";
     formularioBolo.fecha_evento = "";
@@ -176,7 +176,7 @@ onMounted(cargarFacturas);
             </td>
             <td class="px-6 py-4">
               <div class="font-medium text-slate-800">
-                {{ factura.estudiante?.nombre }}
+                {{ factura.cliente?.nombre }}
               </div>
               <div class="text-xs text-slate-400 truncate max-w-[200px]">
                 {{ factura.concepto }}
@@ -231,8 +231,8 @@ onMounted(cargarFacturas);
             <td colspan="6" class="px-6 py-12 text-center text-slate-400">
               {{
                 cargando
-                  ? "Cargando facturas..."
-                  : "No hay facturas en el historial."
+                   ? "Cargando facturas..."
+                   : "No hay facturas en el historial."
               }}
             </td>
           </tr>
@@ -269,13 +269,13 @@ onMounted(cargarFacturas);
                 >Cliente (Entidad/Organizador)</label
               >
               <select
-                v-model="formularioBolo.estudiante_id"
+                v-model="formularioBolo.cliente_id"
                 required
                 class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-purple-500"
               >
                 <option value="" disabled>Selecciona un cliente...</option>
                 <option
-                  v-for="c in estudiantes.filter((e) => e.tipo === 'bolo')"
+                  v-for="c in clientes.filter((e) => e.tipo === 'bolo')"
                   :key="c.id"
                   :value="c.id"
                 >
@@ -283,11 +283,11 @@ onMounted(cargarFacturas);
                 </option>
               </select>
               <p
-                v-if="!estudiantes.some((e) => e.tipo === 'bolo')"
+                v-if="!clientes.some((e) => e.tipo === 'bolo')"
                 class="text-xs text-amber-600 mt-1 italic"
               >
                 * Primero debes crear un cliente de tipo "Bolo" en la sección
-                Estudiantes.
+                Clientes.
               </p>
             </div>
 

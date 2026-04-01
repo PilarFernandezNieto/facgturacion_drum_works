@@ -83,7 +83,7 @@ const handleLogin = async () => await authStore.login(processing, errors, form);
           {{ processing ? "Iniciando sesión..." : "Entrar al Panel" }}
         </button>
       </form>
-
+      <!-- 
       <div class="mt-8 text-center text-sm text-slate-600">
         ¿No tienes cuenta?
         <router-link
@@ -92,7 +92,7 @@ const handleLogin = async () => await authStore.login(processing, errors, form);
         >
           Regístrate aquí
         </router-link>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>

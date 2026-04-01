@@ -60,9 +60,9 @@
     <div class="datos-bloque">
         <div class="cliente-box">
             <div class="etiqueta">DATOS CLIENTE</div>
-            <strong>{{ $estudiante->nombre }}</strong><br>
-            @if($estudiante->nif_cif) DNI/NIF: {{ $estudiante->nif_cif }} @endif<br>
-            @if($estudiante->direccion) {{ $estudiante->direccion }} @endif
+            <strong>{{ $cliente->nombre }}</strong><br>
+            @if($cliente->nif_cif) DNI/NIF: {{ $cliente->nif_cif }} @endif<br>
+            @if($cliente->direccion) {{ $cliente->direccion }} @endif
         </div>
         <div class="info-factura-box">
             <strong>Nº Factura:</strong> {{ $codigo_factura }}<br>

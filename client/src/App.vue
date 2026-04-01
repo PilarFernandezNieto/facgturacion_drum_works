@@ -39,11 +39,11 @@ const handleLogout = () => {
         </router-link>
 
         <router-link
-          :to="{ name: 'estudiantes' }"
+          :to="{ name: 'clientes' }"
           class="flex items-center px-4 py-3 rounded-lg text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition"
           active-class="bg-blue-600 !text-white shadow-md shadow-blue-200"
         >
-          <span class="font-medium">Estudiantes</span>
+          <span class="font-medium">Clientes</span>
         </router-link>
 
         <router-link
