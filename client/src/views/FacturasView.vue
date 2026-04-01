@@ -2,11 +2,17 @@
 import { ref, onMounted, reactive, computed } from "vue";
 import api from "@/api/axios";
 import { useAuthStore } from "@/stores/auth";
+import { storeToRefs } from "pinia";
+import { useClienteStore } from "@/stores/cliente";
+
+import { confirmDialog, notifyError, toast } from "@/utils/swal";
 
 const authStore = useAuthStore();
+const clienteStore = useClienteStore();
+const { clientes } = storeToRefs(clienteStore);
+
 const facturas = ref([]);
-const clientes = ref([]);
-const cargando = ref(true);
+const isLoading = ref(true);
 const generando = ref(false);
 const mostrarModalBolo = ref(false);
 
@@ -28,36 +34,35 @@ const totalBolo = computed(() => {
 });
 
 async function cargarFacturas() {
-  cargando.value = true;
+  isLoading.value = true;
   try {
-    const [resFacturas, resClientes] = await Promise.all([
+    const [resFacturas] = await Promise.all([
       api.get("facturas"),
-      api.get("clientes"),
+      clienteStore.cargarClientes(),
     ]);
     facturas.value = resFacturas.data;
-    clientes.value = resClientes.data;
   } catch (error) {
     console.error("Error:", error);
   } finally {
-    cargando.value = false;
+    isLoading.value = false;
   }
 }
 
 async function generarMasiva() {
-  if (
-    !confirm(
-      "Se van a generar las facturas de todos los alumnos de CLASES para el mes actual. ¿Continuar?",
-    )
-  )
-    return;
+  const result = await confirmDialog(
+    "Generar Facturas",
+    "Se van a generar las facturas de todos los alumnos de CLASES para el mes actual. ¿Continuar?",
+    "info",
+  );
+  if (!result.isConfirmed) return;
 
   generando.value = true;
   try {
     const r = await api.post("facturas/generar-masiva");
-    alert(r.data.mensaje);
+    toast(r.data.mensaje);
     await cargarFacturas();
   } catch (error) {
-    alert("Error al generar las facturas de clases.");
+    notifyError("Error", "No se pudieron generar las facturas.");
   } finally {
     generando.value = false;
   }
@@ -70,6 +75,7 @@ async function guardarBolo() {
       serie: "B",
     };
     await api.post("facturas", payload);
+    toast("Factura B generada con éxito");
     mostrarModalBolo.value = false;
     await cargarFacturas();
     // Limpiar formulario
@@ -78,7 +84,7 @@ async function guardarBolo() {
     formularioBolo.concepto = "";
     formularioBolo.fecha_evento = "";
   } catch (error) {
-    alert("Error al guardar factura de bolo.");
+    notifyError("Error", "Error al guardar factura de bolo.");
   }
 }
 
@@ -87,18 +93,26 @@ async function cambiarEstado(factura) {
   try {
     await api.put(`facturas/${factura.id}/estado`, { estado: nuevoEstado });
     factura.estado = nuevoEstado;
+    toast(`Factura marcada como ${nuevoEstado}`);
   } catch (error) {
-    alert("Error al actualizar estado.");
+    notifyError("Error", "No se pudo cambiar el estado.");
   }
 }
 
 async function eliminarFactura(id) {
-  if (!confirm("¿Eliminar esta factura permanentemente?")) return;
+  const result = await confirmDialog(
+    "¿Eliminar factura?",
+    "¿Estás seguro de eliminar esta factura permanentemente?",
+    "warning",
+  );
+  if (!result.isConfirmed) return;
+
   try {
     await api.delete(`facturas/${id}`);
+    toast("Factura eliminada");
     await cargarFacturas();
   } catch (e) {
-    alert("No se pudo eliminar.");
+    notifyError("Error", "No se pudo eliminar.");
   }
 }
 
@@ -163,7 +177,7 @@ onMounted(cargarFacturas);
             </th>
           </tr>
         </thead>
-        <tbody v-if="!cargando && facturas.length">
+        <tbody v-if="!isLoading && facturas.length">
           <tr
             v-for="factura in facturas"
             :key="factura.id"
@@ -230,9 +244,9 @@ onMounted(cargarFacturas);
           <tr>
             <td colspan="6" class="px-6 py-12 text-center text-slate-400">
               {{
-                cargando
-                   ? "Cargando facturas..."
-                   : "No hay facturas en el historial."
+                isLoading
+                  ? "isLoading facturas..."
+                  : "No hay facturas en el historial."
               }}
             </td>
           </tr>

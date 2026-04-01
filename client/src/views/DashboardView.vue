@@ -1,41 +1,53 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import api from "@/api/axios";
+import { storeToRefs } from "pinia";
+import { useClienteStore } from "@/stores/cliente";
 
-const totalClientes = ref(0);
-const recaudadoMes = ref(0);
-const facturasPendientes = ref(0);
-const cargando = ref(true);
+const clienteStore = useClienteStore();
+const { clientes } = storeToRefs(clienteStore);
+
+// Estado
+const todasFacturas = ref([]);
+const isLoading = ref(true);
+
+// Stats derivadas
+const totalClientes = computed(() => clientes.value.length);
+
+const ahora = new Date();
+const mesActual = ahora.getMonth();
+const anioActual = ahora.getFullYear();
+
+const facturasMesActual = computed(() => {
+  return todasFacturas.value.filter((f) => {
+    if (!f.fecha_emision) return false;
+    const [y, m] = f.fecha_emision.split("-").map(Number);
+    return y === anioActual && m - 1 === mesActual;
+  });
+});
+
+const recaudadoMes = computed(() => {
+  return facturasMesActual.value
+    .filter((f) => f.estado === "pagada")
+    .reduce((sum, f) => sum + parseFloat(f.monto || 0), 0);
+});
+
+const facturasPendientes = computed(() => {
+  return todasFacturas.value.filter((f) => f.estado === "pendiente").length;
+});
 
 async function cargarStats() {
-  cargando.value = true;
+  isLoading.value = true;
   try {
-    // Clientes
-    const resClientes = await api.get("clientes");
-    totalClientes.value = resClientes.data.length;
-
-    // Facturas para el mes actual
-    const resFacturas = await api.get("facturas");
-    const ahora = new Date();
-    const facturasMesActual = resFacturas.data.filter((f) => {
-      const fecha = new Date(f.fecha_emision);
-      return (
-        fecha.getMonth() === ahora.getMonth() &&
-        fecha.getFullYear() === ahora.getFullYear()
-      );
-    });
-
-    recaudadoMes.value = facturasMesActual
-      .filter((f) => f.estado === "pagada")
-      .reduce((sum, f) => sum + parseFloat(f.monto), 0);
-
-    facturasPendientes.value = facturasMesActual.filter(
-      (f) => f.estado === "pendiente",
-    ).length;
+    const [resFacturas] = await Promise.all([
+      api.get("facturas"),
+      clienteStore.cargarClientes(),
+    ]);
+    todasFacturas.value = resFacturas.data;
   } catch (error) {
     console.error("Error al cargar estadísticas:", error);
   } finally {
-    cargando.value = false;
+    isLoading.value = false;
   }
 }
 
