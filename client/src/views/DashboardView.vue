@@ -87,15 +87,15 @@ onMounted(cargarStats);
           Añade clientes a tu panel y genera todas las facturas del mes con un
           solo clic en la sección de facturas.
         </p>
-        <div class="flex gap-4">
+        <div class="flex flex-col lg:flex-row gap-4">
           <router-link
             :to="{ name: 'clientes' }"
-            class="bg-white text-principal px-6 py-2 rounded-xl font-bold hover:bg-blue-50 transition"
+            class="bg-white text-principal text-center px-6 py-2 rounded-xl font-bold hover:bg-blue-50 transition"
             >Gestionar Clientes</router-link
           >
           <router-link
             :to="{ name: 'facturas' }"
-            class="bg-principal text-white px-6 py-2 rounded-xl font-bold hover:bg-principal-hover transition"
+            class="bg-principal text-white text-center px-6 py-2 rounded-xl font-bold hover:bg-principal-hover transition"
             >Ver Facturación</router-link
           >
         </div>

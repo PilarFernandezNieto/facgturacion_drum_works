@@ -1,4 +1,5 @@
 <script setup>
+import { ref } from "vue";
 import { RouterView, useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import AppSidebar from "./components/ui/AppSidebar.vue";
@@ -6,6 +7,7 @@ import AppHeader from "./components/ui/AppHeader.vue";
 
 const authStore = useAuthStore();
 const router = useRouter();
+const sidebarOpen = ref(false);
 
 const handleLogout = () => {
   authStore.logout();
@@ -21,10 +23,17 @@ const handleLogout = () => {
   </div>
 
   <div v-else class="flex min-h-screen bg-slate-50">
-    <AppSidebar @logout="handleLogout" />
+    <AppSidebar
+      :open="sidebarOpen"
+      @logout="handleLogout"
+      @close="sidebarOpen = false"
+    />
 
-    <main class="ml-64 flex-1 p-8">
-      <AppHeader :user="authStore.user" />
+    <main class="flex-1 p-4 sm:p-8 lg:ml-64">
+      <AppHeader
+        :user="authStore.user"
+        @toggle-sidebar="sidebarOpen = !sidebarOpen"
+      />
       <Suspense>
         <RouterView />
       </Suspense>

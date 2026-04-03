@@ -1,7 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
 
-
 @theme {
   --font-inter: "Inter", sans-serif;
   --color-principal: #a30000;
@@ -21,7 +20,7 @@
   }
 
   h1 {
-    font-size: var(--text-3xl);
+    font-size: clamp(1.25rem, 4vw, 1.875rem);
     font-weight: var(--font-weight-bold);
     text-transform: uppercase;
     color: var(--color-principal);
