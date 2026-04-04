@@ -21,6 +21,9 @@ const formulario = reactive({
   email: "",
   telefono: "",
   direccion: "",
+  codigo_postal: "",
+  localidad: "",
+  provincia: "",
   curso: "",
   cuota_mensual: 0,
   tipo: "alumno",
@@ -286,41 +289,47 @@ onMounted(() => {
     <!-- Modal Formulario -->
     <div
       v-if="mostrarModal"
-      class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+      class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center sm:p-4 z-50 overflow-hidden"
     >
       <div
-        class="bg-white rounded-2xl w-full max-w-lg shadow-2xl animate-in fade-in zoom-in duration-200"
+        class="bg-white rounded-t-2xl sm:rounded-2xl w-[90%] lg:w-[55%] shadow-2xl animate-in fade-in slide-in-from-bottom-4 sm:zoom-in duration-200 max-h-[95dvh] flex flex-col"
       >
+        <!-- Cabecera fija -->
         <div
-          class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl"
+          class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl shrink-0"
         >
           <h3 class="text-xl font-bold text-slate-800">
             {{ editando ? "Editar Cliente" : "Nuevo Cliente" }}
           </h3>
           <button
             @click="mostrarModal = false"
-            class="text-slate-400 hover:text-slate-600"
+            class="text-slate-400 hover:text-slate-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-200 transition"
           >
             ✕
           </button>
         </div>
 
-        <form @submit.prevent="guardarCliente" novalidate class="p-6 space-y-4">
-          <div class="grid grid-cols-2 gap-4">
-            <div class="col-span-2">
+        <!-- Contenido con scroll -->
+        <form
+          @submit.prevent="guardarCliente"
+          novalidate
+          class="p-5 space-y-4 overflow-y-auto"
+        >
+          <div class="grid grid-cols-12 gap-2">
+            <div class="col-span-12">
               <label class="block text-sm font-medium text-slate-700 mb-1"
                 >Tipo de Cliente</label
               >
               <select
                 v-model="formulario.tipo"
-                class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500"
+                class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-principal-200"
               >
                 <option value="alumno">Alumno (Clases)</option>
                 <option value="bolo">Bolos (Conciertos)</option>
               </select>
             </div>
 
-            <div class="col-span-2">
+            <div class="col-span-12">
               <label class="block text-sm font-medium text-slate-700 mb-1"
                 >Nombre Completo / Razón Social</label
               >
@@ -328,42 +337,42 @@ onMounted(() => {
                 v-model="formulario.nombre"
                 type="text"
                 required
-                class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500"
+                class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-principal-200"
               />
             </div>
 
-            <div class="col-span-1">
+            <div class="col-span-12 lg:col-span-6">
               <label class="block text-sm font-medium text-slate-700 mb-1"
                 >NIF / CIF</label
               >
               <input
                 v-model="formulario.nif_cif"
                 type="text"
-                class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500 uppercase"
+                class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-principal-200 uppercase"
               />
             </div>
 
-            <div class="col-span-1">
-              <label class="block text-sm font-medium text-slate-700 mb-1"
-                >{{
+            <div class="col-span-12 lg:col-span-6">
+              <label class="block text-sm font-medium text-slate-700 mb-1">
+                {{
                   formulario.tipo === "alumno"
                     ? "Cuota Mensual"
                     : "Precio Base Bolo"
                 }}
-                (€)</label
-              >
+                (€)
+              </label>
               <input
                 v-model="formulario.cuota_mensual"
                 type="number"
                 step="0.01"
                 required
-                class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-principal-200 font-mono"
               />
             </div>
 
             <div
               v-if="formulario.tipo === 'alumno'"
-              class="col-span-2 animate-in slide-in-from-top-2"
+              class="col-span-12 animate-in slide-in-from-top-2"
             >
               <label class="block text-sm font-medium text-slate-700 mb-1"
                 >Curso / Grupo</label
@@ -371,59 +380,87 @@ onMounted(() => {
               <input
                 v-model="formulario.curso"
                 type="text"
-                placeholder="Ej: Inglés B2"
-                class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500"
+                class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-principal-200"
               />
             </div>
 
-            <div class="col-span-2">
+            <div class="col-span-12">
               <label class="block text-sm font-medium text-slate-700 mb-1"
                 >Dirección Fiscal / Postal</label
               >
               <input
                 v-model="formulario.direccion"
                 type="text"
-                class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500"
+                class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-principal-200"
               />
             </div>
 
-            <div class="col-span-1">
+            <div class="col-span-12 lg:col-span-4">
+              <label class="block text-sm font-medium text-slate-700 mb-1"
+                >C.P.</label
+              >
+              <input
+                v-model="formulario.codigo_postal"
+                type="text"
+                class="px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-principal-200"
+              />
+            </div>
+
+            <div class="col-span-12 lg:col-span-4">
+              <label class="block text-sm font-medium text-slate-700 mb-1"
+                >Localidad</label
+              >
+              <input
+                v-model="formulario.localidad"
+                type="text"
+                class="px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-principal-200"
+              />
+            </div>
+
+            <div class="col-span-12 lg:col-span-4">
+              <label class="block text-sm font-medium text-slate-700 mb-1"
+                >Provincia</label
+              >
+              <input
+                v-model="formulario.provincia"
+                type="text"
+                class="px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-principal-200"
+              />
+            </div>
+
+            <div class="col-span-12 lg:col-span-6">
               <label class="block text-sm font-medium text-slate-700 mb-1"
                 >Email</label
               >
               <input
                 v-model="formulario.email"
                 type="email"
-                class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500"
+                class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-principal-200"
               />
             </div>
 
-            <div class="col-span-1">
+            <div class="col-span-12 lg:col-span-6">
               <label class="block text-sm font-medium text-slate-700 mb-1"
                 >Teléfono</label
               >
               <input
                 v-model="formulario.telefono"
                 type="text"
-                class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500"
+                class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-principal-200"
               />
             </div>
           </div>
 
-          <div class="pt-4 flex gap-3">
+          <!-- Botones-->
+          <div class="pt-2 flex flex-col md:flex-row gap-3 bg-white pb-1">
             <button
               type="button"
               @click="mostrarModal = false"
-              class="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50"
+              class="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition"
             >
               Cancelar
             </button>
-            <button
-              type="submit"
-              class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold shadow-md shadow-blue-100"
-            >
-              Guardar Cliente
-            </button>
+            <PrimaryButton type="submit" class="flex-1">Guardar</PrimaryButton>
           </div>
         </form>
       </div>
