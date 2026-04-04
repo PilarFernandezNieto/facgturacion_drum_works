@@ -14,10 +14,11 @@ const pageTitle = computed(() => route.meta?.title ?? "");
 
 <template>
   <header class="mb-8 flex justify-between items-center">
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-4 min-w-0">
       <!-- Botón hamburguesa solo en móvil -->
       <button
-        class="lg:hidden p-2 rounded-lg hover:bg-slate-100 transition text-slate-600"
+        class="lg:hidden shrink-0 p-2 rounded-lg hover:bg-slate-100 transition text-slate-600"
+        aria-label="Abrir menú"
         @click="$emit('toggle-sidebar')"
       >
         <svg
@@ -38,7 +39,7 @@ const pageTitle = computed(() => route.meta?.title ?? "");
       <h1>{{ pageTitle }}</h1>
     </div>
 
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-3 shrink-0">
       <span class="hidden sm:block text-sm font-medium text-slate-500 italic">
         {{ user?.name }}
       </span>

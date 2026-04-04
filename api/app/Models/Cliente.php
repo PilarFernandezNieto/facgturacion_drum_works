@@ -15,6 +15,9 @@ class Cliente extends Model
         'email',
         'telefono',
         'direccion',
+        'codigo_postal',
+        'localidad',
+        'provincia',
         'curso',
         'cuota_mensual',
         'tipo' // alumno o bolo

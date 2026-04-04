@@ -93,7 +93,7 @@ const manejarRegistro = async () =>
           {{ errors.message }}
         </div>
 
-        <PrimaryButton type="submit" :disabled="processing">
+        <PrimaryButton type="submit" :disabled="processing" class="w-full">
           {{ processing ? "Registrando..." : "Empezar ahora" }}
         </PrimaryButton>
       </form>

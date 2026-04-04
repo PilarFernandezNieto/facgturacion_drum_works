@@ -76,7 +76,7 @@ const handleLogin = async () => await authStore.login(processing, errors, form);
           {{ errors.message }}
         </div>
 
-        <PrimaryButton type="submit" :disabled="processing">
+        <PrimaryButton type="submit" :disabled="processing" class="w-full">
           {{ processing ? "Iniciando sesión..." : "Iniciar Sesión" }}
         </PrimaryButton>
       </form>

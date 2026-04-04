@@ -7,11 +7,10 @@ import { useClienteStore } from "@/stores/cliente";
 
 import { confirmDialog, notifyError, toast } from "@/utils/swal";
 import ScreenLoader from "@/components/ui/ScreenLoader.vue";
+import FacturaComponent from "@/components/ui/FacturaComponent.vue";
 
-const authStore = useAuthStore();
 const clienteStore = useClienteStore();
 const facturaStore = useFacturaStore();
-const backendUrl = import.meta.env.VITE_APP_BACKEND_URL;
 
 const { clientes } = storeToRefs(clienteStore);
 const {
@@ -128,27 +127,30 @@ onMounted(cargarDatos);
     <ScreenLoader />
   </div>
 
-  <div v-else class="space-y-6">
-    <div class="flex justify-between items-center">
+  <div v-else class="space-y-6 overflow-x-hidden">
+    <!-- Cabecera -->
+    <div
+      class="flex flex-col gap-4 md:flex-row md:justify-between md:items-center"
+    >
       <div>
         <h2>Control de Facturación</h2>
         <p class="text-sm text-slate-500">
           Gestiona tus ingresos de clases (C) y bolos (B).
         </p>
       </div>
-      <div class="flex gap-3">
+      <div class="flex flex-col gap-3 sm:flex-row">
         <button
           @click="mostrarModalBolo = true"
-          class="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg font-bold transition shadow-lg shadow-purple-100 flex items-center gap-2"
+          class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-lg shadow-purple-100 flex items-center justify-center gap-2 text-sm"
         >
           🎸 Nueva Factura Bolo
         </button>
         <button
           @click="generarMasiva"
           :disabled="generando"
-          class="bg-principal hover:bg-principal-hover text-white px-5 py-2 rounded-lg font-bold transition shadow-lg shadow-principal-100 disabled:opacity-50 flex items-center gap-2"
+          class="bg-principal hover:bg-principal-hover text-white px-4 py-2 rounded-lg font-bold transition shadow-lg shadow-principal-100 disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
         >
-          <span v-if="!generando">⚡ Generar Facturas Clases (Mes)</span>
+          <span v-if="!generando">⚡ Generar Clases (Mes)</span>
           <span v-else>Generando...</span>
         </button>
       </div>
@@ -207,131 +209,26 @@ onMounted(cargarDatos);
     </div>
 
     <!-- Lista de Facturas -->
+
     <div
       class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden"
     >
-      <table class="w-full text-left border-collapse">
-        <thead class="bg-slate-50 border-b border-slate-100">
-          <tr>
-            <th class="px-6 py-4 font-semibold text-slate-700">№ Factura</th>
-            <th class="px-6 py-4 font-semibold text-slate-700">
-              Cliente / Alumno
-            </th>
-            <th class="px-6 py-4 font-semibold text-slate-700">Fecha</th>
-            <th class="px-6 py-4 font-semibold text-slate-700 text-right">
-              Total
-            </th>
-            <th class="px-6 py-4 font-semibold text-slate-700 text-center">
-              Estado
-            </th>
-            <th class="px-6 py-4 font-semibold text-slate-700 text-center">
-              Acciones
-            </th>
-          </tr>
-        </thead>
-        <tbody v-if="facturasFiltradas.length">
-          <tr
-            v-for="factura in facturasFiltradas"
-            :key="factura.id"
-            class="border-b border-slate-50 hover:bg-slate-50/50 transition"
-          >
-            <td class="px-6 py-4">
-              <span class="font-mono font-bold text-slate-900">{{
-                factura.codigo
-              }}</span>
-            </td>
-            <td class="px-6 py-4">
-              <div class="font-medium text-slate-800">
-                {{ factura.cliente?.nombre }}
-              </div>
-              <div class="text-xs text-slate-400 truncate max-w-60">
-                {{ factura.concepto }}
-              </div>
-            </td>
-            <td class="px-6 py-4 text-slate-600">
-              {{ formatearFecha(factura.fecha_emision) }}
-            </td>
-            <td class="px-6 py-4 text-right">
-              <div class="font-bold text-slate-900">{{ factura.monto }}€</div>
-              <div
-                v-if="factura.iva_monto > 0"
-                class="text-[10px] text-slate-400"
-              >
-                IVA incl.
-              </div>
-            </td>
-            <td class="px-6 py-4 text-center">
-              <span
-                @click="toggleEstado(factura)"
-                :class="
-                  factura.estado === 'pendiente'
-                    ? 'bg-amber-100 text-amber-700'
-                    : 'bg-emerald-100 text-emerald-700'
-                "
-                class="px-3 py-1 rounded-full text-xs font-bold cursor-pointer hover:opacity-80 transition"
-              >
-                {{ factura.estado.toUpperCase() }}
-              </span>
-            </td>
-            <td class="px-6 py-4 text-center">
-              <div class="flex justify-center items-center gap-2">
-                <a
-                  :href="`${backendUrl}/facturas/${factura.id}/pdf?token=${authStore.token()}`"
-                  target="_blank"
-                  class="text-blue-600 hover:bg-blue-50 px-2 py-1 rounded border border-blue-200 text-sm font-bold transition"
-                >
-                  PDF
-                </a>
-                <button
-                  @click="eliminarFactura(factura.id)"
-                  class="text-red-400 hover:text-principal text-xs"
-                >
-                  <svg
-                    width="30px"
-                    height="30px"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    stroke="#dc2626"
-                  >
-                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                    <g
-                      id="SVGRepo_tracerCarrier"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    ></g>
-                    <g id="SVGRepo_iconCarrier">
-                      <path
-                        d="M4 6H20M16 6L15.7294 5.18807C15.4671 4.40125 15.3359 4.00784 15.0927 3.71698C14.8779 3.46013 14.6021 3.26132 14.2905 3.13878C13.9376 3 13.523 3 12.6936 3H11.3064C10.477 3 10.0624 3 9.70951 3.13878C9.39792 3.26132 9.12208 3.46013 8.90729 3.71698C8.66405 4.00784 8.53292 4.40125 8.27064 5.18807L8 6M18 6V16.2C18 17.8802 18 18.7202 17.673 19.362C17.3854 19.9265 16.9265 20.3854 16.362 20.673C15.7202 21 14.8802 21 13.2 21H10.8C9.11984 21 8.27976 21 7.63803 20.673C7.07354 20.3854 6.6146 19.9265 6.32698 19.362C6 18.7202 6 17.8802 6 16.2V6M14 10V17M10 10V17"
-                        stroke="#dc2626"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      ></path>
-                    </g>
-                  </svg>
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-        <tbody v-else>
-          <tr>
-            <td colspan="6" class="px-6 py-12 text-center text-slate-400">
-              No hay facturas en el historial.
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <FacturaComponent
+        v-for="factura in facturasFiltradas"
+        :key="factura.id"
+        :factura="factura"
+        @toggle-estado="toggleEstado"
+        @eliminar="eliminarFactura"
+      />
     </div>
 
     <!-- Modal Factura Bolo -->
     <div
       v-if="mostrarModalBolo"
-      class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+      class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center sm:p-4 z-50 overflow-hidden"
     >
       <div
-        class="bg-white rounded-2xl w-full max-w-xl shadow-2xl animate-in zoom-in duration-200"
+        class="bg-white rounded-t-2xl sm:rounded-2xl w-[90%] lg:w-[55%] shadow-2xl animate-in fade-in slide-in-from-bottom-4 sm:zoom-in duration-200 max-h-[95dvh] flex flex-col"
       >
         <div
           class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl"
@@ -348,8 +245,8 @@ onMounted(cargarDatos);
         </div>
 
         <form @submit.prevent="guardarBolo" novalidate class="p-6 space-y-4">
-          <div class="grid grid-cols-2 gap-4">
-            <div class="col-span-2">
+          <div class="grid grid-cols-12 gap-4">
+            <div class="col-span-12">
               <label class="block text-sm font-medium text-slate-700 mb-1"
                 >Cliente (Entidad/Organizador)</label
               >
@@ -360,11 +257,12 @@ onMounted(cargarDatos);
               >
                 <option value="" disabled>Selecciona un cliente...</option>
                 <option
-                  v-for="c in clientes.filter((e) => e.tipo === 'bolo')"
-                  :key="c.id"
-                  :value="c.id"
+                  v-for="cliente in clientes.filter((e) => e.tipo === 'bolo')"
+                  :key="cliente.id"
+                  :value="cliente.id"
                 >
-                  {{ c.nombre }} ({{ c.nif_cif }})
+                  {{ cliente.nombre }}
+                  <span v-if="cliente.nif_cif">({{ cliente.nif_cif }})</span>
                 </option>
               </select>
               <p
@@ -376,7 +274,7 @@ onMounted(cargarDatos);
               </p>
             </div>
 
-            <div class="col-span-2">
+            <div class="col-span-12">
               <label class="block text-sm font-medium text-slate-700 mb-1"
                 >Concepto del Concierto</label
               >
@@ -389,7 +287,7 @@ onMounted(cargarDatos);
               ></textarea>
             </div>
 
-            <div class="col-span-1">
+            <div class="col-span-12 lg:col-span-6">
               <label class="block text-sm font-medium text-slate-700 mb-1"
                 >Fecha del Concierto</label
               >
@@ -401,7 +299,7 @@ onMounted(cargarDatos);
               />
             </div>
 
-            <div class="col-span-1">
+            <div class="col-span-12 lg:col-span-6">
               <label class="block text-sm font-medium text-slate-700 mb-1"
                 >Fecha Emisión</label
               >
@@ -413,7 +311,7 @@ onMounted(cargarDatos);
               />
             </div>
 
-            <div class="col-span-1">
+            <div class="col-span-12 lg:col-span-6">
               <label class="block text-sm font-medium text-slate-700 mb-1"
                 >Base Imponible (€)</label
               >
@@ -426,7 +324,7 @@ onMounted(cargarDatos);
               />
             </div>
 
-            <div class="col-span-1">
+            <div class="col-span-12 lg:col-span-6">
               <label class="block text-sm font-medium text-slate-700 mb-1"
                 >Cálculo Fiscal</label
               >

@@ -27,7 +27,7 @@
   }
 
   h2 {
-    font-size: var(--text-2xl);
+    font-size: clamp(1rem, 4vw, 1.6rem);
     font-weight: var(--font-weight-bold);
     text-transform: uppercase;
     color: var(--color-principal);

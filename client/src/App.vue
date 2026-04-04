@@ -22,14 +22,14 @@ const handleLogout = () => {
     </Suspense>
   </div>
 
-  <div v-else class="flex min-h-screen bg-slate-50">
+  <div v-else class="flex min-h-screen bg-slate-50 overflow-x-hidden">
     <AppSidebar
       :open="sidebarOpen"
       @logout="handleLogout"
       @close="sidebarOpen = false"
     />
 
-    <main class="flex-1 p-4 sm:p-8 lg:ml-64">
+    <main class="flex-1 min-w-0 p-4 sm:p-8 lg:ml-64">
       <AppHeader
         :user="authStore.user"
         @toggle-sidebar="sidebarOpen = !sidebarOpen"
